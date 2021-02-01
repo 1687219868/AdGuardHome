@@ -92,7 +92,7 @@ export default class ClientsApi {
         const queryParams = {
             ip0: ip0,
         }
-        return await fetch(`/control/clients/find?${qs.stringify(queryParams, { arrayFormat: 'comma' })}`, {
+        return await fetch(`/control/clients/find?${qs.stringify(queryParams, { arrayFormat: 'comma', encode: false })}`, {
             method: 'GET',
         }).then(async (res) => {
             if (res.status === 200) {

@@ -3,9 +3,9 @@
 export interface IFilter {
     enabled: boolean;
     id: number;
-    last_updated?: string;
+    last_updated: string;
     name: string;
-    rules_count?: number;
+    rules_count: number;
     url: string;
 }
 
@@ -34,14 +34,18 @@ export default class Filter {
         return typeof id === 'number';
     }
 
-    readonly _last_updated: string | undefined;
+    readonly _last_updated: string;
 
     /**
      * Description: undefined
      * Example: 2018-10-30T12:18:57+03:00
      */
-    get lastUpdated(): string | undefined {
+    get lastUpdated(): string {
         return this._last_updated;
+    }
+
+    static lastUpdatedValidate(lastUpdated: string): boolean {
+        return typeof lastUpdated === 'string' && !!lastUpdated.trim();
     }
 
     readonly _name: string;
@@ -58,14 +62,18 @@ export default class Filter {
         return typeof name === 'string' && !!name.trim();
     }
 
-    readonly _rules_count: number | undefined;
+    readonly _rules_count: number;
 
     /**
      * Description: undefined
      * Example: 5912
      */
-    get rulesCount(): number | undefined {
+    get rulesCount(): number {
         return this._rules_count;
+    }
+
+    static rulesCountValidate(rulesCount: number): boolean {
+        return typeof rulesCount === 'number';
     }
 
     readonly _url: string;
@@ -86,13 +94,9 @@ export default class Filter {
     constructor(props: IFilter) {
         this._enabled = props.enabled;
         this._id = props.id;
-        if (typeof props.last_updated === 'string') {
-            this._last_updated = props.last_updated.trim();
-        }
+        this._last_updated = props.last_updated.trim();
         this._name = props.name.trim();
-        if (typeof props.rules_count === 'number') {
-            this._rules_count = props.rules_count;
-        }
+        this._rules_count = props.rules_count;
         this._url = props.url.trim();
     }
 
@@ -100,15 +104,11 @@ export default class Filter {
         const data: IFilter = {
             enabled: this._enabled,
             id: this._id,
+            last_updated: this._last_updated,
             name: this._name,
+            rules_count: this._rules_count,
             url: this._url,
         };
-        if (typeof this._last_updated !== 'undefined') {
-            data.last_updated = this._last_updated;
-        }
-        if (typeof this._rules_count !== 'undefined') {
-            data.rules_count = this._rules_count;
-        }
         return data;
     }
 
@@ -116,9 +116,9 @@ export default class Filter {
         const validate = {
             enabled: typeof this._enabled === 'boolean',
             id: typeof this._id === 'number',
-            last_updated: !this._last_updated ? true : typeof this._last_updated === 'string' && !this._last_updated ? true : this._last_updated,
+            last_updated: typeof this._last_updated === 'string' && !this._last_updated ? true : this._last_updated,
             name: typeof this._name === 'string' && !this._name ? true : this._name,
-            rules_count: !this._rules_count ? true : typeof this._rules_count === 'number',
+            rules_count: typeof this._rules_count === 'number',
             url: typeof this._url === 'string' && !this._url ? true : this._url,
         };
         const isError: string[] = [];

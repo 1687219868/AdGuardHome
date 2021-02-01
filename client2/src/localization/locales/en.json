@@ -121,6 +121,7 @@
     "dashboard_filter_rules": "Count of filter rules",
     "dashboard_blocked_queries": "Blocked queries",
     "dashboard_filter_rules_count": "%enabled% of %all% filters",
+    "dashboard_server_statistics": "Internal server statistic",
     "other" : "Other",
     "ads" : "Ads",
     "trackers" : "Trackers",

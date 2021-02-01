@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import Store from 'Store';
 import { InnerLayout } from 'Common/ui/layouts';
 import theme from 'Lib/theme';
-import { BlockCard, TopDomains, BlockedQueries, TopClients } from './components';
+import { BlockCard, TopDomains, BlockedQueries, TopClients, ServerStatistics } from './components';
 
 const Dashboard:FC = observer(() => {
     const store = useContext(Store);
@@ -126,11 +126,8 @@ const Dashboard:FC = observer(() => {
                         />
                     </Col>
                 </Row>
-                <Row gutter={[24, 24]}>
-                    <Col span={24}>
-                        <TopClients />
-                    </Col>
-                </Row>
+                <TopClients />
+                <ServerStatistics />
             </div>
         </InnerLayout>
     );

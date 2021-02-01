@@ -34,6 +34,11 @@ const TopClients: FC = observer(() => {
                         <div className={s.tableGrid} key={id}>
                             <div>
                                 {c.name}
+                                <div className={s.ids}>
+                                    {c.ids?.map((cid) => (
+                                        <div key={cid}>{cid}</div>
+                                    ))}
+                                </div>
                             </div>
                             <div>
                                 {request}

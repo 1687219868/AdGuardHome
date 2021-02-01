@@ -69,22 +69,28 @@ export default class Dashboard implements IStore {
         if (result) {
             this.stats = new Stats(result);
             if (this.stats.topClients) {
-                const topClient = Object.keys(this.stats.topClients[0].numberData)[0];
-                yield this.getClient(topClient);
+                // TODO: fix bycicle
+                const topClients = this.stats.topClients.map((e) => {
+                    return Object.keys(e.numberData)[0];
+                });
+                let firstClient = topClients.shift();
+                firstClient += '&';
+                const topClientsReq = firstClient + topClients.map((ip, index) => `ip${index + 1}=${ip}`).join('&');
+                yield this.getClient(topClientsReq);
             }
         }
     }
 
     * getClient(ip: string) {
+        // if & is encoding set in clientsFind qs options - encode: false
         const response = yield clientsApi.clientsFind(ip);
         const { result } = errorChecker<IClientsFindEntry[]>(response);
         if (result) {
-            const client = result[0];
-            if (client) {
-                const [, data] = Object.entries(client)[0];
-                this.clientsInfo = new Map();
-                this.clientsInfo.set(ip, new ClientFindSubEntry(data));
-            }
+            this.clientsInfo = new Map();
+            result.forEach((client) => {
+                const [clientIp, data] = Object.entries(client)[0];
+                this.clientsInfo.set(clientIp, new ClientFindSubEntry(data));
+            });
         }
     }
 
