@@ -67,7 +67,7 @@ const Dashboard:FC = observer(() => {
                 <Row gutter={[24, 24]}>
                     <Col span={24} md={18}>
                         <Row gutter={[24, 24]}>
-                            <Col span={8}>
+                            <Col span={24} md={8}>
                                 <BlockCard
                                     title={intl.getMessage('dashboard_blocked_ads')}
                                     overal={numBlockedFiltering!}
@@ -75,7 +75,7 @@ const Dashboard:FC = observer(() => {
                                     color={theme.chartColors.red}
                                 />
                             </Col>
-                            <Col span={8}>
+                            <Col span={24} md={8}>
                                 <BlockCard
                                     title={intl.getMessage('dashboard_blocked_trackers')}
                                     overal={numBlockedFiltering!}
@@ -83,7 +83,7 @@ const Dashboard:FC = observer(() => {
                                     color={theme.chartColors.orange}
                                 />
                             </Col>
-                            <Col span={8}>
+                            <Col span={24} md={8}>
                                 <BlockCard
                                     title={intl.getMessage('stats_adult')}
                                     overal={numReplacedParental!}
@@ -91,7 +91,7 @@ const Dashboard:FC = observer(() => {
                                     color={theme.chartColors.purple}
                                 />
                             </Col>
-                            <Col span={8}>
+                            <Col span={24} md={8}>
                                 <BlockCard
                                     title={intl.getMessage('stats_malware_phishing')}
                                     overal={numReplacedSafebrowsing!}
@@ -99,7 +99,7 @@ const Dashboard:FC = observer(() => {
                                     color={theme.chartColors.red}
                                 />
                             </Col>
-                            <Col span={8}>
+                            <Col span={24} md={8}>
                                 <BlockCard
                                     title={intl.getMessage('average_processing_time')}
                                     overal={`${Math.round(avgProcessingTime! * 100)} ${intl.getMessage('milliseconds_abbreviation')}`}
@@ -107,7 +107,7 @@ const Dashboard:FC = observer(() => {
                                     color={theme.chartColors.green}
                                 />
                             </Col>
-                            <Col span={8}>
+                            <Col span={24} md={8}>
                                 <BlockCard
                                     title={intl.getMessage('dashboard_filter_rules')}
                                     overal={allRules!}
@@ -117,7 +117,7 @@ const Dashboard:FC = observer(() => {
                             </Col>
                         </Row>
                     </Col>
-                    <Col span={6}>
+                    <Col span={24} md={6}>
                         {/* TODO: fix chart */}
                         <BlockedQueries
                             other={numBlockedFiltering! / 3}
