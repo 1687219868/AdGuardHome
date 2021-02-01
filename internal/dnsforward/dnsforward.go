@@ -2,9 +2,11 @@
 package dnsforward
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"runtime"
 	"sync"
 	"time"
@@ -108,6 +110,12 @@ func (s *Server) Close() {
 	s.stats = nil
 	s.queryLog = nil
 	s.dnsProxy = nil
+
+	err := s.ipset.Close()
+	if err != nil {
+		log.Error("closing ipset: %s", err)
+	}
+
 	s.Unlock()
 }
 
@@ -190,11 +198,23 @@ func (s *Server) Prepare(config *ServerConfig) error {
 
 	// Initialize IPSET configuration
 	// --
-	s.ipset.init(s.conf.IPSETList)
+	err := s.ipset.init(s.conf.IPSETList)
+	if err != nil {
+		if !errors.Is(err, os.ErrPermission) {
+			return fmt.Errorf("cannot initialize ipset: %w", err)
+		}
+
+		// ipset cannot currently be initialized if the server was
+		// installed from Snap or when the user or the binary doesn't
+		// have the required permissions.
+		//
+		// Log and go on.
+		log.Error("cannot initialize ipset: %s", err)
+	}
 
 	// Prepare DNS servers settings
 	// --
-	err := s.prepareUpstreamSettings()
+	err = s.prepareUpstreamSettings()
 	if err != nil {
 		return err
 	}
