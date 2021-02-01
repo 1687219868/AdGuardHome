@@ -2,7 +2,6 @@ import React, { FC, useContext } from 'react';
 import { Button } from 'antd';
 import cn from 'classnames';
 import { observer } from 'mobx-react-lite';
-import { BarChart, Bar } from 'recharts';
 
 import Store from 'Store';
 
@@ -49,8 +48,6 @@ const TopClients: FC = observer(() => {
                             </div>
                             <div>
                                 API / {request}
-                                <BarChart>
-                                </BarChart>
                             </div>
                             <div>
                                 <Button>
