@@ -24,7 +24,7 @@ const BlockCard: FC<BlockCardProps> = ({ overal, data, color, title, text }) => 
                 </ResponsiveContainer>
             )}
             {text && (
-                <div className={s.title}>
+                <div>
                     {text}
                 </div>
             )}

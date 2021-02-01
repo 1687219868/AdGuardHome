@@ -17,7 +17,7 @@ const TopClients: FC = observer(() => {
     return (
         <div className={s.container}>
             <div className={s.title}>{intl.getMessage('Top Clients')}</div>
-            <div className={s.content}>
+            <div className={s.table}>
                 <div className={cn(s.tableTitle, s.tableGrid)}>
                     <div>{intl.getMessage('client_table_header')}</div>
                     <div>{intl.getMessage('requests')}</div>

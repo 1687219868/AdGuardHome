@@ -2,6 +2,7 @@ import { flow, makeAutoObservable, observable } from 'mobx';
 
 import clientsApi from 'Apis/clients';
 import statsApi from 'Apis/stats';
+import filteringApi from 'Apis/filtering';
 import tlsApi from 'Apis/tls';
 
 import { errorChecker } from 'Helpers/apiErrors';
@@ -11,6 +12,7 @@ import StatsConfig, { IStatsConfig } from 'Entities/StatsConfig';
 import TlsConfig, { ITlsConfig } from 'Entities/TlsConfig';
 import { IClientsFindEntry } from 'Entities/ClientsFindEntry';
 import ClientFindSubEntry from 'Entities/ClientFindSubEntry';
+import FilterStatus, { IFilterStatus } from 'Entities/FilterStatus';
 
 import { IStore } from './utils';
 
@@ -27,19 +29,25 @@ export default class Dashboard implements IStore {
 
     tlsConfig: TlsConfig | undefined;
 
+    filteringConfig: FilterStatus | undefined;
+
     constructor(rootStore: Store) {
         this.rootStore = rootStore;
         makeAutoObservable(this, {
             rootStore: false,
             inited: observable,
             init: flow,
+
             getStatsConfig: flow,
             getTlsConfig: flow,
             getClient: flow,
-            stats: observable,
-            statsConfig: observable,
-            clientsInfo: observable,
-            tlsConfig: observable,
+            filteringStatus: flow,
+
+            stats: observable.ref,
+            statsConfig: observable.ref,
+            clientsInfo: observable.ref,
+            tlsConfig: observable.ref,
+            filteringConfig: observable.ref,
         });
         this.clientsInfo = new Map();
         if (this.rootStore.login.loggedIn) {
@@ -51,6 +59,7 @@ export default class Dashboard implements IStore {
         yield this.getStatsConfig();
         yield this.getTlsConfig();
         yield this.getStats();
+        yield this.filteringStatus();
         this.inited = true;
     }
 
@@ -92,6 +101,14 @@ export default class Dashboard implements IStore {
         const { result } = errorChecker<ITlsConfig>(response);
         if (result) {
             this.tlsConfig = new TlsConfig(result);
+        }
+    }
+
+    * filteringStatus() {
+        const response = yield filteringApi.filteringStatus();
+        const { result } = errorChecker<IFilterStatus>(response);
+        if (result) {
+            this.filteringConfig = new FilterStatus(result);
         }
     }
 }

@@ -11,6 +11,7 @@ import safesearchApi from 'Apis/safesearch';
 import StatsConfig, { IStatsConfig } from 'Entities/StatsConfig';
 import QueryLogConfig, { IQueryLogConfig } from 'Entities/QueryLogConfig';
 import FilterConfig, { IFilterConfig } from 'Entities/FilterConfig';
+import FilterStatus, { IFilterStatus } from 'Entities/FilterStatus';
 
 import { errorChecker } from 'Helpers/apiErrors';
 
@@ -160,9 +161,9 @@ export default class SomeStore implements IStore {
 
     * filteringStatus() {
         const response = yield filteringApi.filteringStatus();
-        const { result } = errorChecker<IFilterConfig>(response);
+        const { result } = errorChecker<IFilterStatus>(response);
         if (result) {
-            this.filteringConfig = new FilterConfig(result);
+            this.filteringConfig = new FilterStatus(result);
         }
     }
 
