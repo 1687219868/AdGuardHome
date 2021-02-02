@@ -44,11 +44,11 @@ func startDeferStop(t *testing.T, s *Server) {
 	t.Helper()
 
 	err := s.Start()
-	assert.Nilf(t, err, "Failed to start server: %s", err)
+	assert.Nilf(t, err, "failed to start server: %s", err)
 
 	t.Cleanup(func() {
 		err := s.Stop()
-		assert.Nilf(t, err, "DNS server failed to stop: %s", err)
+		assert.Nilf(t, err, "dns server failed to stop: %s", err)
 	})
 }
 
@@ -80,7 +80,7 @@ func TestServer(t *testing.T) {
 			client := dns.Client{Net: tc.proto}
 
 			reply, _, err := client.Exchange(createGoogleATestMessage(), addr.String())
-			assert.Nilf(t, err, "Couldn't talk to server %s: %s", addr, err)
+			assert.Nilf(t, err, "сouldn't talk to server %s: %s", addr, err)
 
 			assertGoogleAResponse(t, reply)
 		})
@@ -104,7 +104,7 @@ func TestServerWithProtectionDisabled(t *testing.T) {
 	addr := s.dnsProxy.Addr(proxy.ProtoUDP)
 	client := dns.Client{Net: proxy.ProtoUDP}
 	reply, _, err := client.Exchange(req, addr.String())
-	assert.Nilf(t, err, "Couldn't talk to server %s: %s", addr, err)
+	assert.Nilf(t, err, "сouldn't talk to server %s: %s", addr, err)
 	assertGoogleAResponse(t, reply)
 }
 
@@ -119,7 +119,7 @@ func createTestTLS(t *testing.T, tlsConf TLSConfig) (s *Server, certPem []byte) 
 	s.conf.TLSConfig = tlsConf
 
 	err := s.Prepare(nil)
-	assert.Nilf(t, err, "Failed to prepare server: %s", err)
+	assert.Nilf(t, err, "failed to prepare server: %s", err)
 
 	return s, certPem
 }
@@ -293,7 +293,7 @@ func TestBlockedRequest(t *testing.T) {
 	req := createTestMessage("nxdomain.example.org.")
 
 	reply, err := dns.Exchange(req, addr.String())
-	assert.Nilf(t, err, "Couldn't talk to server %s: %s", addr, err)
+	assert.Nilf(t, err, "couldn't talk to server %s: %s", addr, err)
 	assert.Equal(t, dns.RcodeSuccess, reply.Rcode)
 	assert.True(t, reply.Answer[0].(*dns.A).A.IsUnspecified())
 }
@@ -550,11 +550,11 @@ func TestNullBlockedRequest(t *testing.T) {
 	}
 
 	reply, err := dns.Exchange(&req, addr.String())
-	assert.Nilf(t, err, "Couldn't talk to server %s: %s", addr, err)
-	assert.Lenf(t, reply.Answer, 1, "DNS server %s returned reply with wrong number of answers - %d", addr, len(reply.Answer))
+	assert.Nilf(t, err, "couldn't talk to server %s: %s", addr, err)
+	assert.Lenf(t, reply.Answer, 1, "dns server %s returned reply with wrong number of answers - %d", addr, len(reply.Answer))
 	a, ok := reply.Answer[0].(*dns.A)
-	assert.Truef(t, ok, "DNS server %s returned wrong answer type instead of A: %v", addr, reply.Answer[0])
-	assert.Truef(t, a.A.IsUnspecified(), "DNS server %s returned wrong answer instead of 0.0.0.0: %v", addr, a.A)
+	assert.Truef(t, ok, "dns server %s returned wrong answer type instead of A: %v", addr, reply.Answer[0])
+	assert.Truef(t, a.A.IsUnspecified(), "dns server %s returned wrong answer instead of 0.0.0.0: %v", addr, a.A)
 }
 
 func TestBlockedCustomIP(t *testing.T) {
@@ -614,12 +614,12 @@ func TestBlockedByHosts(t *testing.T) {
 	req := createTestMessage("host.example.org.")
 
 	reply, err := dns.Exchange(req, addr.String())
-	assert.Nilf(t, err, "Couldn't talk to server %s: %s", addr, err)
-	assert.Lenf(t, reply.Answer, 1, "DNS server %s returned reply with wrong number of answers - %d", addr, len(reply.Answer))
+	assert.Nilf(t, err, "couldn't talk to server %s: %s", addr, err)
+	assert.Lenf(t, reply.Answer, 1, "dns server %s returned reply with wrong number of answers - %d", addr, len(reply.Answer))
 
 	a, ok := reply.Answer[0].(*dns.A)
-	assert.Truef(t, ok, "DNS server %s returned wrong answer type instead of A: %v", addr, reply.Answer[0])
-	assert.Equalf(t, net.IP{127, 0, 0, 1}, a.A, "DNS server %s returned wrong answer instead of 8.8.8.8: %v", addr, a.A)
+	assert.Truef(t, ok, "dns server %s returned wrong answer type instead of A: %v", addr, reply.Answer[0])
+	assert.Equalf(t, net.IP{127, 0, 0, 1}, a.A, "dns server %s returned wrong answer instead of 8.8.8.8: %v", addr, a.A)
 }
 
 func TestBlockedBySafeBrowsing(t *testing.T) {
@@ -643,11 +643,11 @@ func TestBlockedBySafeBrowsing(t *testing.T) {
 	req := createTestMessage("wmconvirus.narod.ru.")
 
 	reply, err := dns.Exchange(req, addr.String())
-	assert.Nilf(t, err, "Couldn't talk to server %s: %s", addr, err)
-	assert.Lenf(t, reply.Answer, 1, "DNS server %s returned reply with wrong number of answers - %d", addr, len(reply.Answer))
+	assert.Nilf(t, err, "couldn't talk to server %s: %s", addr, err)
+	assert.Lenf(t, reply.Answer, 1, "dns server %s returned reply with wrong number of answers - %d", addr, len(reply.Answer))
 
 	a, ok := reply.Answer[0].(*dns.A)
-	if assert.Truef(t, ok, "DNS server %s returned wrong answer type instead of A: %v", addr, reply.Answer[0]) {
+	if assert.Truef(t, ok, "dns server %s returned wrong answer type instead of A: %v", addr, reply.Answer[0]) {
 		found := false
 		for _, blockAddr := range addrs {
 			if blockAddr == a.A.String() {
@@ -655,7 +655,7 @@ func TestBlockedBySafeBrowsing(t *testing.T) {
 				break
 			}
 		}
-		assert.Truef(t, found, "DNS server %s returned wrong answer: %v", addr, a.A)
+		assert.Truef(t, found, "dns server %s returned wrong answer: %v", addr, a.A)
 	}
 }
 
@@ -854,7 +854,7 @@ func exchangeAndAssertResponse(t *testing.T, client *dns.Client, addr net.Addr, 
 
 	req := createTestMessage(host)
 	reply, _, err := client.Exchange(req, addr.String())
-	assert.Nilf(t, err, "Couldn't talk to server %s: %s", addr, err)
+	assert.Nilf(t, err, "couldn't talk to server %s: %s", addr, err)
 	assertResponse(t, reply, ip)
 }
 
@@ -889,10 +889,10 @@ func assertGoogleAResponse(t *testing.T, reply *dns.Msg) {
 func assertResponse(t *testing.T, reply *dns.Msg, ip net.IP) {
 	t.Helper()
 
-	assert.Lenf(t, reply.Answer, 1, "DNS server returned reply with wrong number of answers - %d", len(reply.Answer))
+	assert.Lenf(t, reply.Answer, 1, "dns server returned reply with wrong number of answers - %d", len(reply.Answer))
 	a, ok := reply.Answer[0].(*dns.A)
-	if assert.Truef(t, ok, "DNS server returned wrong answer type instead of A: %v", reply.Answer[0]) {
-		assert.Truef(t, a.A.Equal(ip), "DNS server returned wrong answer instead of %s: %s", ip, a.A)
+	if assert.Truef(t, ok, "dns server returned wrong answer type instead of A: %v", reply.Answer[0]) {
+		assert.Truef(t, a.A.Equal(ip), "dns server returned wrong answer instead of %s: %s", ip, a.A)
 	}
 }
 
