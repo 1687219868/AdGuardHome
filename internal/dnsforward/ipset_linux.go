@@ -37,6 +37,11 @@ type ipsetCtx struct {
 	nameToIpset    map[string]ipsetProps
 	domainToIpsets map[string][]ipsetProps
 
+	// TODO(a.garipov): Currently, the ipset list is static, and we don't
+	// read the IPs already in sets, so we can assume that all incoming IPs
+	// are either added to all corresponding ipsets or not.  When that stops
+	// being the case, for example if we add dynamic reconfiguration of
+	// ipsets, this map will need to become a per-ipset-name one.
 	addedIPs map[[16]byte]struct{}
 
 	ipv4Conn *ipset.Conn
@@ -187,14 +192,18 @@ func (c *ipsetCtx) init(ipsetConfig []string) (err error) {
 // Close closes the Linux Netfilter connections.
 func (c *ipsetCtx) Close() (err error) {
 	var errors []error
-	err = c.ipv4Conn.Close()
-	if err != nil {
-		errors = append(errors, err)
+	if c.ipv4Conn != nil {
+		err = c.ipv4Conn.Close()
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 
-	err = c.ipv6Conn.Close()
-	if err != nil {
-		errors = append(errors, err)
+	if c.ipv6Conn != nil {
+		err = c.ipv6Conn.Close()
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 
 	if len(errors) != 0 {
@@ -233,6 +242,9 @@ func (c *ipsetCtx) lookupHost(host string) (sets []ipsetProps) {
 		}
 
 		i = strings.Index(host, ".")
+		if i == -1 {
+			break
+		}
 	}
 
 	// Check the root catch-all one.
@@ -289,9 +301,13 @@ func (c *ipsetCtx) skipIpsetProcessing(ctx *dnsContext) (ok bool) {
 
 // process adds the resolved IP addresses to the domain's ipsets, if any.
 func (c *ipsetCtx) process(ctx *dnsContext) (rc resultCode) {
+	var err error
+
 	if c == nil {
 		return resultCodeSuccess
 	}
+
+	log.Debug("ipset: starting processing")
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -308,6 +324,8 @@ func (c *ipsetCtx) process(ctx *dnsContext) (rc resultCode) {
 	host = strings.ToLower(host)
 	sets := c.lookupHost(host)
 	if len(sets) == 0 {
+		log.Debug("ipset: no ipsets for host %s", host)
+
 		return resultCodeSuccess
 	}
 
@@ -342,7 +360,6 @@ func (c *ipsetCtx) process(ctx *dnsContext) (rc resultCode) {
 		v4s = append(v4s, ip)
 	}
 
-	var err error
 setLoop:
 	for _, set := range sets {
 		switch set.family {
@@ -363,6 +380,20 @@ setLoop:
 	}
 	if err != nil {
 		log.Error("ipset: adding host ips: %s", err)
+	} else {
+		log.Debug("ipset: processed %d new ips", len(v4s)+len(v6s))
+	}
+
+	for _, ip := range v4s {
+		var iparr [16]byte
+		copy(iparr[:], ip.To16())
+		c.addedIPs[iparr] = struct{}{}
+	}
+
+	for _, ip := range v6s {
+		var iparr [16]byte
+		copy(iparr[:], ip.To16())
+		c.addedIPs[iparr] = struct{}{}
 	}
 
 	return resultCodeSuccess
